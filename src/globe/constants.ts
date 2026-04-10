@@ -6,8 +6,8 @@ export const GLOBE_RADIUS = 1;
 
 // Lift offsets above the sphere surface to avoid z-fighting with the Earth mesh.
 export const COUNTRY_OUTLINE_LIFT = 1.001;
-export const ARC_BASE_LIFT = 1.002;
-export const MARKER_LIFT = 1.005;
+export const ARC_BASE_LIFT = 1.015;
+export const MARKER_LIFT = 1.02;
 
 // Visual style
 export const OCEAN_COLOR = '#0b3a5e';

@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber/native';
 import { Vector3 } from 'three';
 import type { Stop } from '../types';
 import { latLngToVec3 } from './latLngToVec3';
+import { haversineMiles } from '../lib/distance';
 import type { PlaybackStatus } from './usePlayback';
 
 interface CameraRigProps {
@@ -12,7 +13,10 @@ interface CameraRigProps {
   legProgress: number;
 }
 
-const CAMERA_DISTANCE = 2.8;
+const CAMERA_DISTANCE_MIN = 2.8;
+const CAMERA_DISTANCE_MAX = 4.2;
+/** Leg distance (miles) at which the camera reaches max zoom-out. */
+const LONG_LEG_THRESHOLD = 6000;
 /** How aggressively the camera lerps toward its target each frame. */
 const LERP_FACTOR = 0.05;
 
@@ -56,6 +60,8 @@ export function CameraRig({
   useFrame(() => {
     let focusDir: Vector3;
 
+    let dist = CAMERA_DISTANCE_MIN;
+
     if (status === 'idle' || stops.length < 2) {
       focusDir = centroid;
     } else if (status === 'ended') {
@@ -76,9 +82,17 @@ export function CameraRig({
         .clone()
         .lerp(tmpTo.current, legProgress)
         .normalize();
+
+      // Zoom out for long legs so the full arc stays visible.
+      const legMiles = haversineMiles(
+        { lat: stops[i].lat, lng: stops[i].lng },
+        { lat: stops[i + 1].lat, lng: stops[i + 1].lng },
+      );
+      const t = Math.min(1, legMiles / LONG_LEG_THRESHOLD);
+      dist = CAMERA_DISTANCE_MIN + t * (CAMERA_DISTANCE_MAX - CAMERA_DISTANCE_MIN);
     }
 
-    target.current.copy(focusDir).multiplyScalar(CAMERA_DISTANCE);
+    target.current.copy(focusDir).multiplyScalar(dist);
 
     if (!initialized.current) {
       // First frame: snap directly to the target so we don't lerp from the
