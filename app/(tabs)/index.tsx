@@ -18,15 +18,25 @@ export default function TripsListScreen() {
   const { trips, createTrip } = useTrips();
   const [newName, setNewName] = useState('');
 
-  const handleCreate = () => {
+  const [creating, setCreating] = useState(false);
+
+  const handleCreate = async () => {
     const name = newName.trim();
     if (!name) {
       Alert.alert('Give your trip a name');
       return;
     }
-    const trip = createTrip(name);
-    setNewName('');
-    router.push(`/trip/${trip.id}`);
+    setCreating(true);
+    try {
+      const trip = await createTrip(name);
+      setNewName('');
+      router.push(`/trip/${trip.id}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create trip';
+      Alert.alert('Error', message);
+    } finally {
+      setCreating(false);
+    }
   };
 
   return (

@@ -25,8 +25,10 @@ export function buildArcCurve(
   arcHeight: number,
 ): QuadraticBezierCurve3 {
   const mid = new Vector3().addVectors(from, to).multiplyScalar(0.5);
-  const surfaceMid = mid.clone().normalize().multiplyScalar(ARC_BASE_LIFT);
-  const control = surfaceMid.clone().multiplyScalar(1 + arcHeight);
+  // Push the control point out to the surface, then lift by arcHeight.
+  // For long arcs the chord midpoint is deep inside the globe, so we must
+  // normalize to the surface first, then add elevation on top.
+  const control = mid.clone().normalize().multiplyScalar(ARC_BASE_LIFT + arcHeight);
   return new QuadraticBezierCurve3(from, control, to);
 }
 
