@@ -8,6 +8,8 @@ import { PlaybackControls } from '../../../src/globe/PlaybackControls';
 import { DayCounter } from '../../../src/globe/DayCounter';
 import { useTripAudio } from '../../../src/globe/useTripAudio';
 import { getTrackById } from '../../../src/lib/music';
+import { TransportOverlay } from '../../../src/globe/TransportOverlay';
+import type { SpriteOverlayData } from '../../../src/globe/TransportSprite';
 
 /**
  * Phase 3: Fullscreen modal that owns the playback state machine and
@@ -30,6 +32,11 @@ export default function GlobeModalScreen() {
 
   const playback = usePlayback(stops, 20);
 
+  // ── Transport sprite overlay ────────────────────────────
+  const spriteOverlayRef = useRef<SpriteOverlayData>({
+    visible: false, x: 0, y: 0, rotation: 0, transportType: undefined,
+  });
+
   // ── Music state ─────────────────────────────────────────
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const selectedTrack = selectedTrackId ? getTrackById(selectedTrackId) ?? null : null;
@@ -49,7 +56,8 @@ export default function GlobeModalScreen() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
-        <GlobeCanvas stops={stops} playback={playback} />
+        <GlobeCanvas stops={stops} playback={playback} spriteOverlayRef={spriteOverlayRef} />
+        <TransportOverlay overlayRef={spriteOverlayRef} />
 
         <View style={styles.hud} pointerEvents="box-none">
           <View style={styles.topSection}>
