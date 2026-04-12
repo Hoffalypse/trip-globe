@@ -164,7 +164,14 @@ export default function AddStopScreen() {
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
-      <Stack.Screen options={{ title: isEditMode ? 'Edit Stop' : 'Add Stop' }} />
+      <Stack.Screen
+        options={{
+          title: isEditMode ? 'Edit Stop' : 'Add Stop',
+          headerStyle: { backgroundColor: '#0f0d23' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: '700' },
+        }}
+      />
 
       {isEditMode ? (
         <>
@@ -192,6 +199,7 @@ export default function AddStopScreen() {
               setSelectedPlace(null);
             }}
             placeholder="e.g. Paris, Tokyo, Rio..."
+            placeholderTextColor="#6b7280"
             style={styles.input}
             autoFocus
           />
@@ -213,7 +221,7 @@ export default function AddStopScreen() {
               ListHeaderComponent={
                 searching ? (
                   <View style={styles.searchingRow}>
-                    <ActivityIndicator size="small" color="#64748b" />
+                    <ActivityIndicator size="small" color="#8b8fa3" />
                     <Text style={styles.searchingText}>Searching…</Text>
                   </View>
                 ) : null
@@ -264,6 +272,7 @@ export default function AddStopScreen() {
           mode="date"
           display={Platform.OS === 'ios' ? 'compact' : 'default'}
           onChange={handleDateChange}
+          themeVariant="dark"
         />
       )}
 
@@ -325,43 +334,44 @@ export default function AddStopScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc', padding: 16 },
-  label: { fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 6 },
+  container: { flex: 1, backgroundColor: '#0f0d23', padding: 16 },
+  label: { fontSize: 13, fontWeight: '600', color: '#8b8fa3', marginBottom: 6 },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    backgroundColor: '#1c1a36',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
+    color: '#fff',
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#2d2b50',
     marginBottom: 12,
   },
   resultsList: { maxHeight: 260 },
   resultRow: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#1c1a36',
+    borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#2d2b50',
     marginBottom: 6,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  resultName: { fontSize: 15, fontWeight: '500', flex: 1 },
-  resultCountry: { fontSize: 12, color: '#94a3b8' },
+  resultName: { fontSize: 15, fontWeight: '500', flex: 1, color: '#fff' },
+  resultCountry: { fontSize: 12, color: '#8b8fa3' },
   pressed: { opacity: 0.8 },
-  muted: { color: '#64748b', textAlign: 'center', marginTop: 12, lineHeight: 20 },
-  errorText: { color: '#b91c1c', textAlign: 'center', marginTop: 12, fontSize: 13 },
+  muted: { color: '#6b7280', textAlign: 'center', marginTop: 12, lineHeight: 20 },
+  errorText: { color: '#ef4444', textAlign: 'center', marginTop: 12, fontSize: 13 },
   dateButton: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    backgroundColor: '#1c1a36',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#2d2b50',
   },
-  dateButtonText: { fontSize: 15, color: '#0f172a', fontWeight: '500' },
+  dateButtonText: { fontSize: 15, color: '#fff', fontWeight: '500' },
   searchingRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -369,40 +379,40 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 8,
   },
-  searchingText: { color: '#64748b', fontSize: 13 },
+  searchingText: { color: '#8b8fa3', fontSize: 13 },
   selectedCard: {
-    backgroundColor: '#dbeafe',
-    borderRadius: 8,
+    backgroundColor: '#0d3326',
+    borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#93c5fd',
+    borderColor: '#10b981',
   },
-  selectedName: { fontSize: 16, fontWeight: '600', color: '#1e3a8a' },
-  selectedMeta: { fontSize: 12, color: '#1e40af', marginTop: 2 },
-  lockedHint: { fontSize: 11, color: '#64748b', marginTop: 8, fontStyle: 'italic' },
+  selectedName: { fontSize: 16, fontWeight: '600', color: '#10b981' },
+  selectedMeta: { fontSize: 12, color: '#34d399', marginTop: 2 },
+  lockedHint: { fontSize: 11, color: '#6b7280', marginTop: 8, fontStyle: 'italic' },
   transportRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   transportChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#fff',
+    backgroundColor: '#1c1a36',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#2d2b50',
   },
-  transportChipSelected: { backgroundColor: '#2563eb', borderColor: '#2563eb' },
+  transportChipSelected: { backgroundColor: '#10b981', borderColor: '#10b981' },
   transportEmoji: { fontSize: 16 },
-  transportLabel: { fontSize: 13, color: '#334155' },
+  transportLabel: { fontSize: 13, color: '#8b8fa3' },
   transportTextSelected: { color: '#fff', fontWeight: '600' },
   saveButton: {
     marginTop: 'auto',
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: '#10b981',
+    borderRadius: 14,
+    paddingVertical: 16,
     alignItems: 'center',
   },
-  saveButtonDisabled: { backgroundColor: '#94a3b8' },
-  saveButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  saveButtonDisabled: { backgroundColor: '#2d2b50' },
+  saveButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

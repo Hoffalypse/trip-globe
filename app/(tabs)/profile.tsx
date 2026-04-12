@@ -38,29 +38,31 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc', paddingHorizontal: 16 },
+  container: { flex: 1, backgroundColor: '#0f0d23', paddingHorizontal: 16 },
   heading: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: '800',
     marginTop: 16,
-    marginBottom: 12,
+    marginBottom: 16,
+    color: '#fff',
+    letterSpacing: -0.5,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#1c1a36',
+    borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#2d2b50',
     marginBottom: 16,
   },
-  label: { fontSize: 13, color: '#64748b', marginBottom: 4 },
-  value: { fontSize: 16, fontWeight: '500' },
+  label: { fontSize: 13, color: '#8b8fa3', marginBottom: 4 },
+  value: { fontSize: 16, fontWeight: '600', color: '#fff' },
   signOutButton: {
     backgroundColor: '#ef4444',
-    borderRadius: 8,
+    borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  pressed: { opacity: 0.8 },
-  signOutText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  pressed: { opacity: 0.8, transform: [{ scale: 0.98 }] },
+  signOutText: { color: '#fff', fontWeight: '700', fontSize: 16 },
 });

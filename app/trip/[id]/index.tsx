@@ -43,12 +43,22 @@ export default function TripDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: trip.name }} />
+      <Stack.Screen
+        options={{
+          title: trip.name,
+          headerStyle: { backgroundColor: '#0f0d23' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: '700' },
+        }}
+      />
       <SafeAreaView edges={['bottom']} style={styles.container}>
         <View style={styles.statsRow}>
           <Stat label="Stops" value={`${trip.stops.length}`} />
           <Stat label="Miles" value={`${Math.round(miles).toLocaleString()}`} />
-          <Pressable onPress={() => router.push(`/trip/${trip.id}/countries`)}>
+          <Pressable
+            onPress={() => router.push(`/trip/${trip.id}/countries`)}
+            style={({ pressed }) => [styles.statFlex, pressed && styles.statPressed]}
+          >
             <Stat
               label={countries === 1 ? 'Country' : 'Countries'}
               value={`${countries}`}
@@ -59,11 +69,12 @@ export default function TripDetailScreen() {
         <Pressable
           onPress={() => router.push(`/trip/${trip.id}/globe`)}
           style={({ pressed }) => [
-            styles.globePlaceholder,
-            pressed && styles.buttonPressed,
+            styles.globeButton,
+            pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.globePlaceholderText}>🌍 Play Globe</Text>
+          <Text style={styles.globeEmoji}>🌍</Text>
+          <Text style={styles.globeText}>Play Globe</Text>
         </Pressable>
 
         <Text style={styles.sectionHeading}>Stops</Text>
@@ -72,9 +83,11 @@ export default function TripDetailScreen() {
           keyExtractor={(s) => s.id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <Text style={styles.muted}>
-              No stops yet. Tap “Add Stop” to start your trip.
-            </Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>📍</Text>
+              <Text style={styles.muted}>No stops yet</Text>
+              <Text style={styles.emptyHint}>Tap "Add Stop" to begin</Text>
+            </View>
           }
           renderItem={({ item, index }) => (
             <Pressable
@@ -84,11 +97,13 @@ export default function TripDetailScreen() {
               onLongPress={() => handleRemove(item.id)}
               style={({ pressed }) => [
                 styles.stopCard,
-                pressed && styles.buttonPressed,
+                pressed && styles.pressed,
               ]}
             >
               <View style={styles.stopHeader}>
-                <Text style={styles.stopIndex}>{index + 1}</Text>
+                <View style={styles.stopIndexBadge}>
+                  <Text style={styles.stopIndex}>{index + 1}</Text>
+                </View>
                 <Text style={styles.stopName}>{item.name}</Text>
               </View>
               <Text style={styles.stopDate}>{formatStopDate(item.arrivedAt)}</Text>
@@ -99,7 +114,9 @@ export default function TripDetailScreen() {
                 </Text>
               )}
               {item.countryCode ? (
-                <Text style={styles.stopCountry}>{item.countryCode}</Text>
+                <View style={styles.countryBadge}>
+                  <Text style={styles.countryText}>{item.countryCode}</Text>
+                </View>
               ) : null}
             </Pressable>
           )}
@@ -109,7 +126,7 @@ export default function TripDetailScreen() {
           onPress={() => router.push(`/trip/${trip.id}/add-stop`)}
           style={({ pressed }) => [
             styles.addButton,
-            pressed && styles.buttonPressed,
+            pressed && styles.pressed,
           ]}
         >
           <Text style={styles.addButtonText}>+ Add Stop</Text>
@@ -140,7 +157,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc', paddingHorizontal: 16 },
+  container: { flex: 1, backgroundColor: '#0f0d23', paddingHorizontal: 16 },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
@@ -149,60 +166,86 @@ const styles = StyleSheet.create({
   },
   stat: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#1c1a36',
+    borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#2d2b50',
     alignItems: 'center',
   },
-  statValue: { fontSize: 24, fontWeight: '700', color: '#0f172a' },
-  statLabel: { fontSize: 12, color: '#64748b', marginTop: 2 },
-  globePlaceholder: {
-    backgroundColor: '#0f172a',
-    borderRadius: 12,
-    height: 180,
-    marginBottom: 16,
+  statFlex: { flex: 1 },
+  statPressed: { opacity: 0.8, transform: [{ scale: 0.96 }] },
+  statValue: { fontSize: 24, fontWeight: '800', color: '#fff' },
+  statLabel: { fontSize: 12, color: '#8b8fa3', marginTop: 2 },
+  globeButton: {
+    backgroundColor: '#1c1a36',
+    borderRadius: 16,
+    height: 140,
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#2d2b50',
+  },
+  globeEmoji: { fontSize: 40, marginBottom: 8 },
+  globeText: { color: '#34d399', fontSize: 15, fontWeight: '600' },
+  sectionHeading: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 10,
+    color: '#fff',
+  },
+  list: { gap: 10, paddingBottom: 100 },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  emptyIcon: { fontSize: 40, marginBottom: 8 },
+  muted: { color: '#6b7280', textAlign: 'center', fontSize: 15 },
+  emptyHint: { color: '#555770', fontSize: 13, marginTop: 4 },
+  stopCard: {
+    backgroundColor: '#1c1a36',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#2d2b50',
+  },
+  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  stopHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  stopIndexBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#10b981',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  globePlaceholderText: { color: '#fff', fontSize: 14 },
-  sectionHeading: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
-  list: { gap: 10, paddingBottom: 100 },
-  muted: { color: '#64748b', textAlign: 'center', marginTop: 12 },
-  stopCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  stopHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stopIndex: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#2563eb',
     color: '#fff',
-    textAlign: 'center',
-    lineHeight: 24,
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 13,
   },
-  stopName: { fontSize: 16, fontWeight: '600', flex: 1 },
-  stopDate: { fontSize: 13, color: '#2563eb', fontWeight: '500', marginTop: 4 },
-  stopTransport: { fontSize: 13, color: '#475569', marginTop: 4 },
-  stopCountry: { fontSize: 12, color: '#94a3b8', marginTop: 2 },
+  stopName: { fontSize: 16, fontWeight: '600', flex: 1, color: '#fff' },
+  stopDate: { fontSize: 13, color: '#34d399', fontWeight: '500', marginTop: 6 },
+  stopTransport: { fontSize: 13, color: '#8b8fa3', marginTop: 4 },
+  countryBadge: {
+    backgroundColor: '#2d2b50',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    alignSelf: 'flex-start',
+    marginTop: 6,
+  },
+  countryText: { fontSize: 11, color: '#6ee7b7', fontWeight: '600' },
   addButton: {
     position: 'absolute',
     bottom: 20,
     left: 16,
     right: 16,
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: '#10b981',
+    borderRadius: 14,
+    paddingVertical: 16,
     alignItems: 'center',
   },
-  buttonPressed: { opacity: 0.85 },
-  addButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  addButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

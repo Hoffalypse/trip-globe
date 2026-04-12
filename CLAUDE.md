@@ -116,6 +116,31 @@ When implementing a phase:
 3. If a decision in PLAN.md turns out to be wrong, **update PLAN.md** in the same change — don't let it drift from reality
 4. The "Already built (don't rebuild)" section at the bottom of PLAN.md lists existing code — read those files before recreating anything
 
+## Color Scheme & Styling
+
+All screens use a dark theme. Apply these colors consistently to every page:
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| Background | `#0f0d23` | Screen / page background |
+| Card / Input | `#1c1a36` | Cards, inputs, list rows |
+| Border | `#2d2b50` | Card borders, input borders, dividers |
+| Primary accent | `#10b981` | Buttons, active tab, links, selected chips |
+| Highlight text | `#34d399` | Dates, secondary accent text |
+| Soft accent | `#6ee7b7` | Tertiary text on dark backgrounds |
+| Dark accent tint | `#0d3326` | Selected-state card backgrounds (e.g. selected place) |
+| Primary text | `#fff` | Headings, values, card titles |
+| Secondary text | `#8b8fa3` | Labels, stat labels, muted info |
+| Muted text | `#6b7280` | Placeholders, empty-state hints |
+| Tab bar bg | `#13112b` | Bottom tab bar background |
+| Tab inactive | `#555770` | Inactive tab icon color |
+| Destructive | `#ef4444` | Sign out, error text |
+
+- Navigation headers: `backgroundColor: '#0f0d23'`, `headerTintColor: '#fff'`
+- StatusBar style: `light`
+- Border radius: `14` for cards/inputs/buttons, `20` for pill badges
+- Press feedback: `opacity: 0.8, transform: [{ scale: 0.98 }]`
+
 ## Secrets
 
 - `MAPBOX_TOKEN` will live in `app.config.ts → extra`, read at runtime via `expo-constants`. Never commit a real token. Use `.env` + `app.config.ts` reading `process.env.MAPBOX_TOKEN`.

@@ -21,21 +21,38 @@ export default function CountriesScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: `Countries — ${trip.name}` }} />
+      <Stack.Screen
+        options={{
+          title: 'Countries',
+          headerStyle: { backgroundColor: '#0f0d23' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: '700' },
+        }}
+      />
       <SafeAreaView edges={['bottom']} style={styles.container}>
-        <Text style={styles.count}>
-          {countries.length} {countries.length === 1 ? 'country' : 'countries'} visited
-        </Text>
+        <View style={styles.header}>
+          <Text style={styles.countNumber}>{countries.length}</Text>
+          <Text style={styles.countLabel}>
+            {countries.length === 1 ? 'country' : 'countries'} visited
+          </Text>
+          <Text style={styles.tripName}>{trip.name}</Text>
+        </View>
 
         <FlatList
           data={countries}
           keyExtractor={(item) => item.code}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <Text style={styles.muted}>No countries recorded yet.</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>🌍</Text>
+              <Text style={styles.muted}>No countries recorded yet</Text>
+            </View>
           }
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <View style={styles.row}>
+              <View style={styles.rankBadge}>
+                <Text style={styles.rankText}>{index + 1}</Text>
+              </View>
               <Text style={styles.flag}>{item.flag}</Text>
               <View style={styles.info}>
                 <Text style={styles.name}>{item.name}</Text>
@@ -50,28 +67,61 @@ export default function CountriesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc', paddingHorizontal: 16 },
-  count: {
+  container: { flex: 1, backgroundColor: '#0f0d23', paddingHorizontal: 16 },
+  header: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    marginBottom: 8,
+  },
+  countNumber: {
+    fontSize: 56,
+    fontWeight: '800',
+    color: '#10b981',
+    letterSpacing: -2,
+  },
+  countLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#64748b',
-    marginTop: 16,
-    marginBottom: 12,
+    color: '#8b8fa3',
+    marginTop: -4,
   },
-  list: { gap: 8, paddingBottom: 24 },
-  muted: { color: '#64748b', textAlign: 'center', marginTop: 24 },
+  tripName: {
+    fontSize: 13,
+    color: '#555770',
+    marginTop: 8,
+  },
+  list: { gap: 10, paddingBottom: 32 },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  emptyIcon: { fontSize: 48, marginBottom: 12 },
+  muted: { color: '#6b7280', textAlign: 'center', fontSize: 15 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#1c1a36',
+    borderRadius: 16,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#2d2b50',
     gap: 14,
   },
-  flag: { fontSize: 32 },
+  rankBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#2d2b50',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rankText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#34d399',
+  },
+  flag: { fontSize: 36 },
   info: { flex: 1 },
-  name: { fontSize: 16, fontWeight: '600', color: '#0f172a' },
-  code: { fontSize: 13, color: '#94a3b8', marginTop: 2 },
+  name: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  code: { fontSize: 13, color: '#6b7280', marginTop: 2 },
 });

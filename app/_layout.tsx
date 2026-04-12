@@ -11,8 +11,8 @@ function AppContent() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' }}>
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f0d23' }}>
+        <ActivityIndicator size="large" color="#10b981" />
       </View>
     );
   }
@@ -23,11 +23,12 @@ function AppContent() {
 
   return (
     <TripsProvider>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: '#fff' },
-          headerTitleStyle: { fontWeight: '600' },
+          headerStyle: { backgroundColor: '#0f0d23' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: '700' },
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

@@ -46,18 +46,28 @@ function findCountry(feature: MapboxFeature): MapboxContextEntry | undefined {
   return feature.context?.find((c) => c.id.startsWith('country.'));
 }
 
+function findRegion(feature: MapboxFeature): MapboxContextEntry | undefined {
+  return feature.context?.find((c) => c.id.startsWith('region.'));
+}
+
 function extractCountryCode(feature: MapboxFeature): string {
   return findCountry(feature)?.short_code?.toUpperCase() ?? '';
 }
 
 /**
- * Build a clean display label: "City, Country" (e.g. "Tokyo, Japan").
- * Skips verbose intermediate parents like "Tokyo Prefecture" that Mapbox
- * includes in `place_name`.
+ * Build a clean display label.
+ * - US cities include state: "Springfield, Illinois, US"
+ * - Other cities use short country code: "Tokyo, JP"
  */
 function extractDisplayName(feature: MapboxFeature): string {
-  const countryName = findCountry(feature)?.text;
-  return countryName ? `${feature.text}, ${countryName}` : feature.text;
+  const countryCode = extractCountryCode(feature);
+  const region = findRegion(feature);
+
+  if (countryCode === 'US' && region?.text) {
+    return `${feature.text}, ${region.text}, US`;
+  }
+
+  return countryCode ? `${feature.text}, ${countryCode}` : feature.text;
 }
 
 export async function searchPlaces(
