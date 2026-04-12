@@ -306,7 +306,9 @@ export default function AddStopScreen() {
                   ]}
                 >
                   {hasCustomIcon(t) ? (
-                    <TransportIcon type={t} size={20} />
+                    <View style={styles.iconFlipped}>
+                      <TransportIcon type={t} size={20} />
+                    </View>
                   ) : (
                     <Text
                       style={[
@@ -406,6 +408,7 @@ const styles = StyleSheet.create({
   selectedName: { fontSize: 16, fontWeight: '600', color: '#10b981' },
   selectedMeta: { fontSize: 12, color: '#34d399', marginTop: 2 },
   lockedHint: { fontSize: 11, color: '#6b7280', marginTop: 8, fontStyle: 'italic' },
+  iconFlipped: { transform: [{ scaleX: -1 }] },
   transportRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   transportChip: {
     flexDirection: 'row',

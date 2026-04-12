@@ -111,7 +111,9 @@ export default function TripDetailScreen() {
               {item.transportFromPrevious && (
                 <View style={styles.transportRow}>
                   {hasCustomIcon(item.transportFromPrevious) ? (
-                    <TransportIcon type={item.transportFromPrevious} size={20} />
+                    <View style={styles.iconFlipped}>
+                      <TransportIcon type={item.transportFromPrevious} size={20} />
+                    </View>
                   ) : (
                     <Text style={styles.stopTransport}>
                       {TRANSPORT_EMOJI[item.transportFromPrevious]}
@@ -237,6 +239,7 @@ const styles = StyleSheet.create({
   stopName: { fontSize: 16, fontWeight: '600', flex: 1, color: '#fff' },
   stopDate: { fontSize: 13, color: '#34d399', fontWeight: '500', marginTop: 6 },
   transportRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  iconFlipped: { transform: [{ scaleX: -1 }] },
   stopTransport: { fontSize: 13, color: '#8b8fa3' },
   countryBadge: {
     backgroundColor: '#2d2b50',

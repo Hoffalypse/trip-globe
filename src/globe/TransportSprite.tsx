@@ -66,8 +66,8 @@ export function TransportSprite({
 
     if (status === 'ended') {
       const last = legs[legs.length - 1];
-      point = last.curve.getPoint(1);
-      aheadPoint = last.curve.getPoint(0.99);
+      point = last.curve.getPoint(0.99);
+      aheadPoint = last.curve.getPoint(1);
       transportType = stops[stops.length - 1].transportFromPrevious;
     } else if (legIndex < 0 || legIndex >= legs.length) {
       mesh.visible = false;

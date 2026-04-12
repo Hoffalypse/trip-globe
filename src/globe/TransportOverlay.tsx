@@ -30,7 +30,8 @@ const EMOJI_NATURAL_ANGLE: Record<TransportType, number> = {
 
 /** Natural facing angle for custom SVG icons. */
 const SVG_NATURAL_ANGLE: Partial<Record<TransportType, number>> = {
-  plane: 0, // SVG nose points right
+  plane: 0,
+  car: 0,
 };
 
 function getNaturalAngle(type: TransportType | undefined): number {
@@ -76,9 +77,13 @@ export function TransportOverlay({ overlayRef }: TransportOverlayProps) {
         // sin(progress * PI) gives 0→1→0, scale it to go from baseScale to peakScale
         const baseScale = 1;
         const peakScale = 1.8;
-        const scaleBoost = isPlane
-          ? baseScale + (peakScale - baseScale) * Math.sin(data.progress * Math.PI)
-          : 1;
+        const isCar = data.transportType === 'car' && isCustom;
+        let scaleBoost = 1;
+        if (isPlane) {
+          scaleBoost = baseScale + (peakScale - baseScale) * Math.sin(data.progress * Math.PI);
+        } else if (isCar) {
+          scaleBoost = 2;
+        }
 
         view.setNativeProps({
           style: {
