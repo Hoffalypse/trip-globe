@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Platform,
   Pressable,
@@ -124,24 +125,34 @@ export default function AddStopScreen() {
     );
   }
 
-  const handleSave = () => {
-    if (!selectedPlace) return;
-    if (isEditMode && editingStop) {
-      updateStop(trip.id, editingStop.id, {
-        arrivedAt: arrivedAt.toISOString(),
-        transportFromPrevious: isFirstStop ? undefined : transport,
-      });
-    } else {
-      addStop(trip.id, {
-        name: selectedPlace.name,
-        lat: selectedPlace.lat,
-        lng: selectedPlace.lng,
-        countryCode: selectedPlace.countryCode,
-        transportFromPrevious: isFirstStop ? undefined : transport,
-        arrivedAt: arrivedAt.toISOString(),
-      });
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!selectedPlace || saving) return;
+    setSaving(true);
+    try {
+      if (isEditMode && editingStop) {
+        await updateStop(trip.id, editingStop.id, {
+          arrivedAt: arrivedAt.toISOString(),
+          transportFromPrevious: isFirstStop ? undefined : transport,
+        });
+      } else {
+        await addStop(trip.id, {
+          name: selectedPlace.name,
+          lat: selectedPlace.lat,
+          lng: selectedPlace.lng,
+          countryCode: selectedPlace.countryCode,
+          transportFromPrevious: isFirstStop ? undefined : transport,
+          arrivedAt: arrivedAt.toISOString(),
+        });
+      }
+      router.back();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save stop';
+      Alert.alert('Error', message);
+    } finally {
+      setSaving(false);
     }
-    router.back();
   };
 
   const handleDateChange = (event: DateTimePickerEvent, date?: Date) => {
@@ -318,15 +329,15 @@ export default function AddStopScreen() {
 
       <Pressable
         onPress={handleSave}
-        disabled={!selectedPlace}
+        disabled={!selectedPlace || saving}
         style={({ pressed }) => [
           styles.saveButton,
-          !selectedPlace && styles.saveButtonDisabled,
+          (!selectedPlace || saving) && styles.saveButtonDisabled,
           pressed && styles.pressed,
         ]}
       >
         <Text style={styles.saveButtonText}>
-          {isEditMode ? 'Update Stop' : 'Save Stop'}
+          {saving ? 'Saving...' : isEditMode ? 'Update Stop' : 'Save Stop'}
         </Text>
       </Pressable>
     </SafeAreaView>

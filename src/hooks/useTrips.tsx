@@ -11,11 +11,11 @@ import {
   collection,
   doc,
   addDoc,
-  updateDoc,
   onSnapshot,
   query,
   orderBy,
   serverTimestamp,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './useAuth';
@@ -108,13 +108,16 @@ export function TripsProvider({ children }: { children: ReactNode }) {
 
       const docRef = await addDoc(tripsCollection(user.uid), tripData);
 
-      // Return optimistic trip for immediate navigation
-      return {
+      // Insert optimistically so getTrip() works before onSnapshot fires
+      const optimistic: Trip = {
         id: docRef.id,
         name: tripData.name,
         createdAt: new Date().toISOString(),
         stops: [],
       };
+      setTrips((prev) => [optimistic, ...prev]);
+
+      return optimistic;
     },
     [user],
   );
@@ -125,9 +128,6 @@ export function TripsProvider({ children }: { children: ReactNode }) {
       stopInput: Omit<Stop, 'id' | 'arrivedAt'> & { arrivedAt?: string },
     ) => {
       if (!user) return;
-
-      const trip = trips.find((t) => t.id === tripId);
-      if (!trip) return;
 
       const stop: Record<string, unknown> = {
         id: generateId(),
@@ -141,11 +141,15 @@ export function TripsProvider({ children }: { children: ReactNode }) {
         stop.transportFromPrevious = stopInput.transportFromPrevious;
       }
 
-      await updateDoc(tripDoc(user.uid, tripId), {
-        stops: [...trip.stops, stop],
+      const ref = tripDoc(user.uid, tripId);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists()) return;
+        const currentStops = (snap.data().stops as Stop[]) ?? [];
+        tx.update(ref, { stops: [...currentStops, stop] });
       });
     },
-    [user, trips],
+    [user],
   );
 
   const updateStop = useCallback(
@@ -156,34 +160,45 @@ export function TripsProvider({ children }: { children: ReactNode }) {
     ) => {
       if (!user) return;
 
-      const trip = trips.find((t) => t.id === tripId);
-      if (!trip) return;
-
       // Strip undefined values — Firestore rejects them
       const cleanUpdates: Record<string, unknown> = {};
       for (const [key, val] of Object.entries(updates)) {
         if (val !== undefined) cleanUpdates[key] = val;
       }
-      const updatedStops = trip.stops.map((s) =>
-        s.id === stopId ? { ...s, ...cleanUpdates } : s,
-      );
 
-      await updateDoc(tripDoc(user.uid, tripId), { stops: updatedStops });
+      const ref = tripDoc(user.uid, tripId);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists()) return;
+        const currentStops = (snap.data().stops as Stop[]) ?? [];
+        const updatedStops = currentStops.map((s) =>
+          s.id === stopId ? { ...s, ...cleanUpdates } : s,
+        );
+        tx.update(ref, { stops: updatedStops });
+      });
     },
-    [user, trips],
+    [user],
   );
 
   const removeStop = useCallback(
     async (tripId: string, stopId: string) => {
       if (!user) return;
 
-      const trip = trips.find((t) => t.id === tripId);
-      if (!trip) return;
-
-      const filteredStops = trip.stops.filter((s) => s.id !== stopId);
-      await updateDoc(tripDoc(user.uid, tripId), { stops: filteredStops });
+      const ref = tripDoc(user.uid, tripId);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists()) return;
+        const currentStops = (snap.data().stops as Stop[]) ?? [];
+        const filtered = currentStops.filter((s) => s.id !== stopId);
+        // Clear transport on the new first stop — there's no previous stop
+        if (filtered.length > 0 && filtered[0].transportFromPrevious) {
+          const { transportFromPrevious: _, ...rest } = filtered[0];
+          filtered[0] = rest as Stop;
+        }
+        tx.update(ref, { stops: filtered });
+      });
     },
-    [user, trips],
+    [user],
   );
 
   const value = useMemo<TripsContextValue>(
