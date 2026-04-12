@@ -29,10 +29,12 @@ function AppContent() {
           headerStyle: { backgroundColor: '#0f0d23' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: '700' },
+          contentStyle: { backgroundColor: '#0f0d23' },
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="trip/[id]/index" options={{ title: 'Trip' }} />
+        <Stack.Screen name="countries" options={{ title: 'Countries' }} />
+        <Stack.Screen name="trip/[id]/index" options={{ title: 'Trip', headerBackTitle: 'Home' }} />
         <Stack.Screen
           name="trip/[id]/add-stop"
           options={{ title: 'Add Stop', presentation: 'modal' }}

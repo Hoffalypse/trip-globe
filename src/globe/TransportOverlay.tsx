@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TRANSPORT_EMOJI, type TransportType } from '../types';
-import { TransportIcon, hasCustomIcon } from '../components/icons/TransportIcons';
+import { TransportIcon, hasCustomIcon, needsMenuFlip } from '../components/icons/TransportIcons';
 import type { SpriteOverlayData } from './TransportSprite';
 
 /**
@@ -30,8 +30,9 @@ const EMOJI_NATURAL_ANGLE: Record<TransportType, number> = {
 
 /** Natural facing angle for custom SVG icons. */
 const SVG_NATURAL_ANGLE: Partial<Record<TransportType, number>> = {
-  plane: 0,
-  car: 0,
+  plane: 0,   // faces right
+  car: 0,     // faces right
+  train: 180, // faces left
 };
 
 function getNaturalAngle(type: TransportType | undefined): number {
@@ -92,7 +93,7 @@ export function TransportOverlay({ overlayRef }: TransportOverlayProps) {
               { translateX: data.x - 16 },
               { translateY: data.y - 16 },
               { rotate: `${data.rotation - (getNaturalAngle(data.transportType as TransportType))}deg` },
-              ...(isCustom ? [{ scaleY: -1 }] : []),
+              ...(isCustom && needsMenuFlip(data.transportType as TransportType) ? [{ scaleY: -1 }] : []),
               { scale: scaleBoost },
             ],
           },

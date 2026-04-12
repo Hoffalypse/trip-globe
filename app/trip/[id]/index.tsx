@@ -11,7 +11,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTrips } from '../../../src/hooks/useTrips';
 import { totalTripMiles, uniqueCountryCount } from '../../../src/lib/distance';
 import { TRANSPORT_EMOJI, TRANSPORT_LABELS } from '../../../src/types';
-import { TransportIcon, hasCustomIcon } from '../../../src/components/icons/TransportIcons';
+import { TransportIcon, hasCustomIcon, needsMenuFlip } from '../../../src/components/icons/TransportIcons';
 
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -111,7 +111,7 @@ export default function TripDetailScreen() {
               {item.transportFromPrevious && (
                 <View style={styles.transportRow}>
                   {hasCustomIcon(item.transportFromPrevious) ? (
-                    <View style={styles.iconFlipped}>
+                    <View style={needsMenuFlip(item.transportFromPrevious) ? styles.iconFlipped : undefined}>
                       <TransportIcon type={item.transportFromPrevious} size={20} />
                     </View>
                   ) : (

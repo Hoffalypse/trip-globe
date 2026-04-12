@@ -24,7 +24,7 @@ import {
   TRANSPORT_TYPES,
   type TransportType,
 } from '../../../src/types';
-import { TransportIcon, hasCustomIcon } from '../../../src/components/icons/TransportIcons';
+import { TransportIcon, hasCustomIcon, needsMenuFlip } from '../../../src/components/icons/TransportIcons';
 
 /**
  * Stop form screen — handles BOTH "add new stop" and "edit existing stop".
@@ -306,7 +306,7 @@ export default function AddStopScreen() {
                   ]}
                 >
                   {hasCustomIcon(t) ? (
-                    <View style={styles.iconFlipped}>
+                    <View style={needsMenuFlip(t) ? styles.iconFlipped : undefined}>
                       <TransportIcon type={t} size={20} />
                     </View>
                   ) : (

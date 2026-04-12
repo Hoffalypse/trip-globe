@@ -9,7 +9,7 @@ import { TRANSPORT_TYPES, type TransportType } from '../types';
 export const TRANSPORT_ARC_HEIGHT: Record<TransportType, number> = {
   plane: 0.4,
   boat: 0.12,
-  train: 0.06,
+  train: 0.4,
   car: 0.04,
   bike: 0.03,
   walk: 0.02,

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { TRANSPORT_EMOJI, type Stop } from '../types';
+import type { Stop } from '../types';
 import type { PlaybackState } from './usePlayback';
 
 interface DayCounterProps {
@@ -30,14 +30,11 @@ export function DayCounter({ stops, playback }: DayCounterProps) {
   if (!targetStop) return null;
 
   const dayNumber = computeDayNumber(stops, targetStop);
-  const transport = targetStop.transportFromPrevious;
-  const transportEmoji = transport ? TRANSPORT_EMOJI[transport] : '📍';
-
   return (
     <View style={styles.container} pointerEvents="none">
       <Text style={styles.dayLabel}>Day {dayNumber}</Text>
       <Text style={styles.cityLabel}>
-        {transportEmoji} {targetStop.name}
+        {targetStop.name}
       </Text>
     </View>
   );

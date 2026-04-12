@@ -59,12 +59,15 @@ export default function TripsListScreen() {
           <Text style={styles.totalValue}>{totalMiles.toLocaleString()}</Text>
           <Text style={styles.totalLabel}>Miles</Text>
         </View>
-        <View style={styles.totalStat}>
+        <Pressable
+          onPress={() => router.push('/countries')}
+          style={({ pressed }) => [styles.totalStat, pressed && styles.statPressed]}
+        >
           <Text style={styles.totalValue}>{totalCountries}</Text>
           <Text style={styles.totalLabel}>
             {totalCountries === 1 ? 'Country' : 'Countries'}
           </Text>
-        </View>
+        </Pressable>
       </View>
 
       <View style={styles.newTripRow}>
@@ -176,6 +179,7 @@ const styles = StyleSheet.create({
   },
   totalValue: { fontSize: 24, fontWeight: '800', color: '#fff' },
   totalLabel: { fontSize: 12, color: '#8b8fa3', marginTop: 2 },
+  statPressed: { opacity: 0.8, transform: [{ scale: 0.96 }] },
   newTripRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
   input: {
     flex: 1,

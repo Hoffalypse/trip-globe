@@ -67,7 +67,8 @@ function extractDisplayName(feature: MapboxFeature): string {
     return `${feature.text}, ${region.text}, US`;
   }
 
-  return countryCode ? `${feature.text}, ${countryCode}` : feature.text;
+  const countryName = findCountry(feature)?.text;
+  return countryName ? `${feature.text}, ${countryName}` : feature.text;
 }
 
 export async function searchPlaces(
