@@ -1,14 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { PlaybackState } from './usePlayback';
-import { MusicPicker } from './MusicPicker';
 
 interface PlaybackControlsProps {
   playback: PlaybackState;
-  selectedTrackId: string | null;
-  onSelectTrack: (trackId: string | null) => void;
 }
-
-const DURATION_PRESETS: number[] = [10, 20, 30, 60];
 
 /**
  * Bottom-of-screen HUD: play/pause button, progress bar, duration presets.
@@ -19,8 +14,6 @@ const DURATION_PRESETS: number[] = [10, 20, 30, 60];
  */
 export function PlaybackControls({
   playback,
-  selectedTrackId,
-  onSelectTrack,
 }: PlaybackControlsProps) {
   const {
     status,
@@ -29,7 +22,6 @@ export function PlaybackControls({
     plan,
     play,
     pause,
-    setTotalDuration,
   } = playback;
 
   const hasPlan = plan.legDurations.length > 0;
@@ -84,33 +76,6 @@ export function PlaybackControls({
         </Pressable>
       </View>
 
-      <View style={styles.presetRow}>
-        <Text style={styles.presetLabel}>Length</Text>
-        {DURATION_PRESETS.map((sec) => {
-          const selected = totalDuration === sec;
-          return (
-            <Pressable
-              key={sec}
-              onPress={() => setTotalDuration(sec)}
-              style={[
-                styles.presetChip,
-                selected && styles.presetChipSelected,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.presetText,
-                  selected && styles.presetTextSelected,
-                ]}
-              >
-                {sec}s
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <MusicPicker selectedTrackId={selectedTrackId} onSelect={onSelectTrack} />
     </View>
   );
 }

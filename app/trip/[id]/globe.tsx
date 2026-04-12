@@ -23,14 +23,15 @@ import type { SpriteOverlayData } from '../../../src/globe/TransportSprite';
  *   - Bottom: PlaybackControls (play/pause, progress, duration presets)
  */
 export default function GlobeModalScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, duration, track } = useLocalSearchParams<{ id: string; duration?: string; track?: string }>();
   const router = useRouter();
   const { getTrip } = useTrips();
 
   const trip = id ? getTrip(id) : undefined;
   const stops = trip?.stops ?? [];
 
-  const playback = usePlayback(stops, 20);
+  const initialDuration = duration ? parseInt(duration, 10) || 20 : 20;
+  const playback = usePlayback(stops, initialDuration);
 
   // ── Transport sprite overlay ────────────────────────────
   const spriteOverlayRef = useRef<SpriteOverlayData>({
@@ -38,7 +39,7 @@ export default function GlobeModalScreen() {
   });
 
   // ── Music state ─────────────────────────────────────────
-  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+  const [selectedTrackId] = useState<string | null>(track ?? null);
   const selectedTrack = selectedTrackId ? getTrackById(selectedTrackId) ?? null : null;
   useTripAudio(selectedTrack, playback.status, playback.time, playback.totalDuration);
 
@@ -76,11 +77,7 @@ export default function GlobeModalScreen() {
             <DayCounter stops={stops} playback={playback} />
           </View>
 
-          <PlaybackControls
-            playback={playback}
-            selectedTrackId={selectedTrackId}
-            onSelectTrack={setSelectedTrackId}
-          />
+          <PlaybackControls playback={playback} />
         </View>
       </View>
     </>

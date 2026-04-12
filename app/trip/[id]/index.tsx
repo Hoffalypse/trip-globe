@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -12,6 +13,7 @@ import { useTrips } from '../../../src/hooks/useTrips';
 import { totalTripMiles, uniqueCountryCount } from '../../../src/lib/distance';
 import { TRANSPORT_EMOJI, TRANSPORT_LABELS } from '../../../src/types';
 import { TransportIcon, hasCustomIcon, needsMenuFlip } from '../../../src/components/icons/TransportIcons';
+import { MUSIC_TRACKS } from '../../../src/lib/music';
 
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -19,6 +21,8 @@ export default function TripDetailScreen() {
   const { getTrip, removeStop } = useTrips();
 
   const trip = id ? getTrip(id) : undefined;
+  const [selectedDuration, setSelectedDuration] = useState(20);
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
 
   if (!trip) {
     return (
@@ -54,21 +58,26 @@ export default function TripDetailScreen() {
       />
       <SafeAreaView edges={['bottom']} style={styles.container}>
         <View style={styles.statsRow}>
-          <Stat label="Stops" value={`${trip.stops.length}`} />
-          <Stat label="Miles" value={`${Math.round(miles).toLocaleString()}`} />
+          <Stat label="Stops" value={`${trip.stops.length}`} small />
+          <Stat label="Miles" value={`${Math.round(miles).toLocaleString()}`} wide />
           <Pressable
             onPress={() => router.push(`/trip/${trip.id}/countries`)}
-            style={({ pressed }) => [styles.statFlex, pressed && styles.statPressed]}
+            style={({ pressed }) => pressed && styles.statPressed}
           >
             <Stat
               label={countries === 1 ? 'Country' : 'Countries'}
               value={`${countries}`}
+              small
             />
           </Pressable>
         </View>
 
         <Pressable
-          onPress={() => router.push(`/trip/${trip.id}/globe`)}
+          onPress={() =>
+            router.push(
+              `/trip/${trip.id}/globe?duration=${selectedDuration}${selectedTrackId ? `&track=${selectedTrackId}` : ''}`,
+            )
+          }
           style={({ pressed }) => [
             styles.globeButton,
             pressed && styles.pressed,
@@ -77,6 +86,51 @@ export default function TripDetailScreen() {
           <Text style={styles.globeEmoji}>🌍</Text>
           <Text style={styles.globeText}>Play Globe</Text>
         </Pressable>
+
+        <View style={styles.settingsCard}>
+          <View style={styles.settingsRow}>
+            <Text style={styles.settingsLabel}>Length</Text>
+            {[10, 20, 30, 60].map((sec) => {
+              const selected = selectedDuration === sec;
+              return (
+                <Pressable
+                  key={sec}
+                  onPress={() => setSelectedDuration(sec)}
+                  style={[styles.chip, selected && styles.chipSelected]}
+                >
+                  <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+                    {sec}s
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <View style={styles.settingsRow}>
+            <Text style={styles.settingsLabel}>Music</Text>
+            <Pressable
+              onPress={() => setSelectedTrackId(null)}
+              style={[styles.chip, selectedTrackId === null && styles.chipSelected]}
+            >
+              <Text style={[styles.chipText, selectedTrackId === null && styles.chipTextSelected]}>
+                Off
+              </Text>
+            </Pressable>
+            {MUSIC_TRACKS.map((track) => {
+              const selected = selectedTrackId === track.id;
+              return (
+                <Pressable
+                  key={track.id}
+                  onPress={() => setSelectedTrackId(track.id)}
+                  style={[styles.chip, selected && styles.chipSelected]}
+                >
+                  <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+                    {track.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
 
         <Text style={styles.sectionHeading}>Stops</Text>
         <FlatList
@@ -158,9 +212,9 @@ function formatStopDate(iso: string): string {
   });
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, small, wide }: { label: string; value: string; small?: boolean; wide?: boolean }) {
   return (
-    <View style={styles.stat}>
+    <View style={[styles.stat, small && styles.statSmall, wide && styles.statWide]}>
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
@@ -184,22 +238,66 @@ const styles = StyleSheet.create({
     borderColor: '#2d2b50',
     alignItems: 'center',
   },
-  statFlex: { flex: 1 },
+  statSmall: { flex: 0, width: 100 },
+  statWide: { flex: 1 },
   statPressed: { opacity: 0.8, transform: [{ scale: 0.96 }] },
   statValue: { fontSize: 24, fontWeight: '800', color: '#fff' },
   statLabel: { fontSize: 12, color: '#8b8fa3', marginTop: 2 },
   globeButton: {
     backgroundColor: '#1c1a36',
     borderRadius: 16,
-    height: 140,
-    marginBottom: 20,
+    height: 56,
+    marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
     borderWidth: 1,
     borderColor: '#2d2b50',
   },
-  globeEmoji: { fontSize: 40, marginBottom: 8 },
+  globeEmoji: { fontSize: 22 },
   globeText: { color: '#34d399', fontSize: 15, fontWeight: '600' },
+  settingsCard: {
+    backgroundColor: '#1c1a36',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#2d2b50',
+    gap: 12,
+  },
+  settingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  settingsLabel: {
+    color: '#8b8fa3',
+    fontSize: 12,
+    fontWeight: '600',
+    marginRight: 4,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2d2b50',
+  },
+  chipSelected: {
+    backgroundColor: '#0d3326',
+    borderColor: '#10b981',
+  },
+  chipText: {
+    color: '#8b8fa3',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  chipTextSelected: {
+    color: '#10b981',
+    fontWeight: '700',
+  },
   sectionHeading: {
     fontSize: 18,
     fontWeight: '700',
