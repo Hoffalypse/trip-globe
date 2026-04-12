@@ -48,10 +48,12 @@ export default function TripDetailScreen() {
         <View style={styles.statsRow}>
           <Stat label="Stops" value={`${trip.stops.length}`} />
           <Stat label="Miles" value={`${Math.round(miles).toLocaleString()}`} />
-          <Stat
-            label={countries === 1 ? 'Country' : 'Countries'}
-            value={`${countries}`}
-          />
+          <Pressable onPress={() => router.push(`/trip/${trip.id}/countries`)}>
+            <Stat
+              label={countries === 1 ? 'Country' : 'Countries'}
+              value={`${countries}`}
+            />
+          </Pressable>
         </View>
 
         <Pressable

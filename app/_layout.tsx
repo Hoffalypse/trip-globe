@@ -37,6 +37,10 @@ function AppContent() {
           options={{ title: 'Add Stop', presentation: 'modal' }}
         />
         <Stack.Screen
+          name="trip/[id]/countries"
+          options={{ title: 'Countries' }}
+        />
+        <Stack.Screen
           name="trip/[id]/globe"
           options={{
             presentation: 'fullScreenModal',
