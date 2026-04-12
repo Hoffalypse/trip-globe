@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TRANSPORT_EMOJI, type TransportType } from '../types';
-import { TransportIcon, hasCustomIcon, needsMenuFlip } from '../components/icons/TransportIcons';
+import { TransportIcon, hasCustomIcon } from '../components/icons/TransportIcons';
 import type { SpriteOverlayData } from './TransportSprite';
 
 /**
@@ -86,14 +86,34 @@ export function TransportOverlay({ overlayRef }: TransportOverlayProps) {
           scaleBoost = 2;
         }
 
+        const naturalAngle = getNaturalAngle(data.transportType as TransportType);
+        let adjustedRotation = data.rotation - naturalAngle;
+
+        // For custom icons: when traveling rightward (rotation roughly -90 to 90),
+        // the icon would appear upside down. Flip vertically by using scaleY,
+        // but only when needed based on the effective travel direction.
+        let flipY = 1;
+        if (isCustom) {
+          // Normalize rotation to 0-360
+          const norm = ((data.rotation % 360) + 360) % 360;
+          // Traveling rightward: 0-90 or 270-360
+          const goingRight = norm < 90 || norm > 270;
+          // Right-facing SVGs (plane, car) need flip when going LEFT
+          // Left-facing SVGs (train) need flip when going RIGHT
+          const facesRight = naturalAngle === 0;
+          if (facesRight ? !goingRight : goingRight) {
+            flipY = -1;
+          }
+        }
+
         view.setNativeProps({
           style: {
             opacity: 1,
             transform: [
               { translateX: data.x - 16 },
               { translateY: data.y - 16 },
-              { rotate: `${data.rotation - (getNaturalAngle(data.transportType as TransportType))}deg` },
-              ...(isCustom && needsMenuFlip(data.transportType as TransportType) ? [{ scaleY: -1 }] : []),
+              { rotate: `${adjustedRotation}deg` },
+              { scaleY: flipY },
               { scale: scaleBoost },
             ],
           },

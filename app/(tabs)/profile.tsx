@@ -18,7 +18,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
-      <Text style={styles.heading}>Profile</Text>
+      <Text style={styles.heading}>Settings</Text>
       <View style={styles.card}>
         <Text style={styles.label}>Email</Text>
         <Text style={styles.value}>{user?.email ?? '—'}</Text>
