@@ -34,7 +34,7 @@ export default function GlobeModalScreen() {
 
   // ── Transport sprite overlay ────────────────────────────
   const spriteOverlayRef = useRef<SpriteOverlayData>({
-    visible: false, x: 0, y: 0, rotation: 0, transportType: undefined,
+    visible: false, x: 0, y: 0, rotation: 0, transportType: undefined, progress: 0,
   });
 
   // ── Music state ─────────────────────────────────────────

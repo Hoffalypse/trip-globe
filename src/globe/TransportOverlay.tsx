@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TRANSPORT_EMOJI, type TransportType } from '../types';
+import { TransportIcon, hasCustomIcon } from '../components/icons/TransportIcons';
 import type { SpriteOverlayData } from './TransportSprite';
 
 /**
@@ -16,6 +17,7 @@ import type { SpriteOverlayData } from './TransportSprite';
  * 🚲  faces right          → 0° (ish)
  * 📍  no direction         → 0°
  */
+/** Natural facing angle when using the emoji fallback. */
 const EMOJI_NATURAL_ANGLE: Record<TransportType, number> = {
   plane: -45,
   car: 180,
@@ -25,6 +27,19 @@ const EMOJI_NATURAL_ANGLE: Record<TransportType, number> = {
   bike: 0,
   other: 0,
 };
+
+/** Natural facing angle for custom SVG icons. */
+const SVG_NATURAL_ANGLE: Partial<Record<TransportType, number>> = {
+  plane: 0, // SVG nose points right
+};
+
+function getNaturalAngle(type: TransportType | undefined): number {
+  const key = type ?? 'other';
+  if (hasCustomIcon(key)) {
+    return SVG_NATURAL_ANGLE[key] ?? 0;
+  }
+  return EMOJI_NATURAL_ANGLE[key] ?? 0;
+}
 
 interface TransportOverlayProps {
   overlayRef: React.RefObject<SpriteOverlayData>;
@@ -41,6 +56,7 @@ export function TransportOverlay({ overlayRef }: TransportOverlayProps) {
   const viewRef = useRef<View>(null);
   const textRef = useRef<Text>(null);
   const [emoji, setEmoji] = useState('');
+  const [currentTransport, setCurrentTransport] = useState<TransportType | null>(null);
 
   useEffect(() => {
     let lastTransport: string | undefined;
@@ -53,13 +69,26 @@ export function TransportOverlay({ overlayRef }: TransportOverlayProps) {
       if (!view) return;
 
       if (data.visible) {
+        const isCustom = data.transportType && hasCustomIcon(data.transportType as TransportType);
+        const isPlane = data.transportType === 'plane' && isCustom;
+
+        // Parabolic scale: 1.0 at edges, peaks at midpoint
+        // sin(progress * PI) gives 0→1→0, scale it to go from baseScale to peakScale
+        const baseScale = 1;
+        const peakScale = 1.8;
+        const scaleBoost = isPlane
+          ? baseScale + (peakScale - baseScale) * Math.sin(data.progress * Math.PI)
+          : 1;
+
         view.setNativeProps({
           style: {
             opacity: 1,
             transform: [
               { translateX: data.x - 16 },
               { translateY: data.y - 16 },
-              { rotate: `${data.rotation - (EMOJI_NATURAL_ANGLE[(data.transportType as TransportType) ?? 'other'] ?? 0)}deg` },
+              { rotate: `${data.rotation - (getNaturalAngle(data.transportType as TransportType))}deg` },
+              ...(isCustom ? [{ scaleY: -1 }] : []),
+              { scale: scaleBoost },
             ],
           },
         });
@@ -69,7 +98,8 @@ export function TransportOverlay({ overlayRef }: TransportOverlayProps) {
 
       if (data.transportType !== lastTransport) {
         lastTransport = data.transportType;
-        const key = data.transportType as keyof typeof TRANSPORT_EMOJI;
+        const key = data.transportType as TransportType;
+        setCurrentTransport(key ?? null);
         setEmoji(key && TRANSPORT_EMOJI[key] ? TRANSPORT_EMOJI[key] : '📍');
       }
     }, 16); // ~60fps
@@ -83,9 +113,13 @@ export function TransportOverlay({ overlayRef }: TransportOverlayProps) {
       pointerEvents="none"
       style={styles.container}
     >
-      <Text ref={textRef} style={styles.emoji}>
-        {emoji}
-      </Text>
+      {currentTransport && hasCustomIcon(currentTransport) ? (
+        <TransportIcon type={currentTransport} size={28} />
+      ) : (
+        <Text ref={textRef} style={styles.emoji}>
+          {emoji}
+        </Text>
+      )}
     </View>
   );
 }

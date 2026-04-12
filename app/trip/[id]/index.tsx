@@ -11,6 +11,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTrips } from '../../../src/hooks/useTrips';
 import { totalTripMiles, uniqueCountryCount } from '../../../src/lib/distance';
 import { TRANSPORT_EMOJI, TRANSPORT_LABELS } from '../../../src/types';
+import { TransportIcon, hasCustomIcon } from '../../../src/components/icons/TransportIcons';
 
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -108,10 +109,18 @@ export default function TripDetailScreen() {
               </View>
               <Text style={styles.stopDate}>{formatStopDate(item.arrivedAt)}</Text>
               {item.transportFromPrevious && (
-                <Text style={styles.stopTransport}>
-                  {TRANSPORT_EMOJI[item.transportFromPrevious]}{' '}
-                  {TRANSPORT_LABELS[item.transportFromPrevious]} from previous
-                </Text>
+                <View style={styles.transportRow}>
+                  {hasCustomIcon(item.transportFromPrevious) ? (
+                    <TransportIcon type={item.transportFromPrevious} size={20} />
+                  ) : (
+                    <Text style={styles.stopTransport}>
+                      {TRANSPORT_EMOJI[item.transportFromPrevious]}
+                    </Text>
+                  )}
+                  <Text style={styles.stopTransport}>
+                    {' '}{TRANSPORT_LABELS[item.transportFromPrevious]} from previous
+                  </Text>
+                </View>
               )}
               {item.countryCode ? (
                 <View style={styles.countryBadge}>
@@ -227,7 +236,8 @@ const styles = StyleSheet.create({
   },
   stopName: { fontSize: 16, fontWeight: '600', flex: 1, color: '#fff' },
   stopDate: { fontSize: 13, color: '#34d399', fontWeight: '500', marginTop: 6 },
-  stopTransport: { fontSize: 13, color: '#8b8fa3', marginTop: 4 },
+  transportRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  stopTransport: { fontSize: 13, color: '#8b8fa3' },
   countryBadge: {
     backgroundColor: '#2d2b50',
     borderRadius: 10,

@@ -12,6 +12,8 @@ export interface SpriteOverlayData {
   /** Rotation in degrees — 0 = pointing right, 90 = pointing down. */
   rotation: number;
   transportType: string | undefined;
+  /** 0–1 progress along the current leg. */
+  progress: number;
 }
 
 interface TransportSpriteProps {
@@ -49,7 +51,7 @@ export function TransportSprite({
     if (!mesh) return;
 
     const hidden: SpriteOverlayData = {
-      visible: false, x: 0, y: 0, rotation: 0, transportType: undefined,
+      visible: false, x: 0, y: 0, rotation: 0, transportType: undefined, progress: 0,
     };
 
     if (status === 'idle' || legs.length === 0) {
@@ -95,7 +97,8 @@ export function TransportSprite({
     const rotation = Math.atan2(ay - y, ax - x) * (180 / Math.PI);
 
     const visible = _projected.z < 1;
-    overlayRef.current = { visible, x, y, rotation, transportType };
+    const progress = status === 'ended' ? 1 : legProgress;
+    overlayRef.current = { visible, x, y, rotation, transportType, progress };
   });
 
   return (

@@ -24,6 +24,7 @@ import {
   TRANSPORT_TYPES,
   type TransportType,
 } from '../../../src/types';
+import { TransportIcon, hasCustomIcon } from '../../../src/components/icons/TransportIcons';
 
 /**
  * Stop form screen — handles BOTH "add new stop" and "edit existing stop".
@@ -304,14 +305,18 @@ export default function AddStopScreen() {
                     selected && styles.transportChipSelected,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.transportEmoji,
-                      selected && styles.transportTextSelected,
-                    ]}
-                  >
-                    {TRANSPORT_EMOJI[t]}
-                  </Text>
+                  {hasCustomIcon(t) ? (
+                    <TransportIcon type={t} size={20} />
+                  ) : (
+                    <Text
+                      style={[
+                        styles.transportEmoji,
+                        selected && styles.transportTextSelected,
+                      ]}
+                    >
+                      {TRANSPORT_EMOJI[t]}
+                    </Text>
+                  )}
                   <Text
                     style={[
                       styles.transportLabel,
