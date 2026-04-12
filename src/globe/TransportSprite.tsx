@@ -65,10 +65,10 @@ export function TransportSprite({
     let transportType: string | undefined;
 
     if (status === 'ended') {
-      const last = legs[legs.length - 1];
-      point = last.curve.getPoint(0.99);
-      aheadPoint = last.curve.getPoint(1);
-      transportType = stops[stops.length - 1].transportFromPrevious;
+      // Hide the overlay when ended so it doesn't float while the user spins the globe
+      mesh.visible = false;
+      overlayRef.current = hidden;
+      return;
     } else if (legIndex < 0 || legIndex >= legs.length) {
       mesh.visible = false;
       overlayRef.current = hidden;
@@ -97,7 +97,7 @@ export function TransportSprite({
     const rotation = Math.atan2(ay - y, ax - x) * (180 / Math.PI);
 
     const visible = _projected.z < 1;
-    const progress = status === 'ended' ? 1 : legProgress;
+    const progress = legProgress;
     overlayRef.current = { visible, x, y, rotation, transportType, progress };
   });
 

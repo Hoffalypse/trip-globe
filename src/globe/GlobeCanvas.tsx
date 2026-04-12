@@ -7,23 +7,20 @@ import { StopMarkers } from './StopMarkers';
 import { AnimatedTrail } from './AnimatedTrail';
 import { TransportSprite, type SpriteOverlayData } from './TransportSprite';
 import { CameraRig } from './CameraRig';
+import { GlobeOrbit } from './GlobeOrbit';
 import type { PlaybackState } from './usePlayback';
 
 interface GlobeCanvasProps {
   stops: Stop[];
   playback: PlaybackState;
   spriteOverlayRef: RefObject<SpriteOverlayData>;
+  orbitDelta?: RefObject<{ dx: number; dy: number }>;
 }
 
-/**
- * Phase 3 globe scene. The CameraRig owns the camera (follows the active
- * leg or sits at the trip centroid when idle). AnimatedTrail draws the
- * arcs progressively, and TransportSprite rides along the active leg.
- *
- * Note: TripArcs from Phase 2 has been replaced by AnimatedTrail — the
- * static arcs are now just a special case of "all legs fully drawn".
- */
-export function GlobeCanvas({ stops, playback, spriteOverlayRef }: GlobeCanvasProps) {
+export function GlobeCanvas({ stops, playback, spriteOverlayRef, orbitDelta }: GlobeCanvasProps) {
+  const defaultDelta = { current: { dx: 0, dy: 0 } };
+  const delta = orbitDelta ?? defaultDelta;
+
   return (
     <Canvas camera={{ position: [0, 0.6, 2.8], fov: 50 }}>
       <ambientLight intensity={0.55} />
@@ -37,22 +34,24 @@ export function GlobeCanvas({ stops, playback, spriteOverlayRef }: GlobeCanvasPr
         legProgress={playback.legProgress}
       />
 
-      <Earth />
-      <Countries />
-      <StopMarkers stops={stops} />
-      <AnimatedTrail
-        stops={stops}
-        status={playback.status}
-        legIndex={playback.legIndex}
-        legProgress={playback.legProgress}
-      />
-      <TransportSprite
-        stops={stops}
-        status={playback.status}
-        legIndex={playback.legIndex}
-        legProgress={playback.legProgress}
-        overlayRef={spriteOverlayRef}
-      />
+      <GlobeOrbit enabled={playback.status === 'ended'} orbitDelta={delta}>
+        <Earth />
+        <Countries />
+        <StopMarkers stops={stops} />
+        <AnimatedTrail
+          stops={stops}
+          status={playback.status}
+          legIndex={playback.legIndex}
+          legProgress={playback.legProgress}
+        />
+        <TransportSprite
+          stops={stops}
+          status={playback.status}
+          legIndex={playback.legIndex}
+          legProgress={playback.legProgress}
+          overlayRef={spriteOverlayRef}
+        />
+      </GlobeOrbit>
     </Canvas>
   );
 }

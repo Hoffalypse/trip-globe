@@ -14,7 +14,6 @@ export const TRANSPORT_TYPES: TransportType[] = [
   'boat',
   'walk',
   'bike',
-  'other',
 ];
 
 export const TRANSPORT_LABELS: Record<TransportType, string> = {

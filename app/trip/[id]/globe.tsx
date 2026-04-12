@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTrips } from '../../../src/hooks/useTrips';
 import { GlobeCanvas } from '../../../src/globe/GlobeCanvas';
@@ -43,6 +43,21 @@ export default function GlobeModalScreen() {
   const selectedTrack = selectedTrackId ? getTrackById(selectedTrackId) ?? null : null;
   useTripAudio(selectedTrack, playback.status, playback.time, playback.totalDuration);
 
+  // ── Orbit drag state ────────────────────────────────────
+  const orbitDelta = useRef({ dx: 0, dy: 0 });
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gesture) => {
+        orbitDelta.current = { dx: gesture.dx, dy: gesture.dy };
+      },
+      onPanResponderRelease: () => {
+        orbitDelta.current = { dx: 0, dy: 0 };
+      },
+    }),
+  ).current;
+
   // Auto-play the moment the modal opens. We capture `play` in a ref so the
   // effect can run exactly once on mount without re-firing every render.
   const playRef = useRef(playback.play);
@@ -57,8 +72,12 @@ export default function GlobeModalScreen() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
-        <GlobeCanvas stops={stops} playback={playback} spriteOverlayRef={spriteOverlayRef} />
+        <GlobeCanvas stops={stops} playback={playback} spriteOverlayRef={spriteOverlayRef} orbitDelta={orbitDelta} />
         <TransportOverlay overlayRef={spriteOverlayRef} />
+
+        {playback.status === 'ended' && (
+          <View style={styles.touchArea} {...panResponder.panHandlers} />
+        )}
 
         <View style={styles.hud} pointerEvents="box-none">
           <View style={styles.topSection}>
@@ -116,4 +135,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  touchArea: {
+    ...StyleSheet.absoluteFillObject,
+    top: 120,
+    bottom: 120,
+  },
 });
